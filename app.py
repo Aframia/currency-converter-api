@@ -59,20 +59,21 @@ def convert_currency():
 def add_rate():
  try:
   payload = request.get_json()
-  rate = payload['rate']
+  rate_value = payload['rate']
   from_currency = payload['from_currency']
   to_currency = payload['to_currency']
 
-  rate = Rates.query.filter_by(from_currency=from_currency,to_currency=to_currency).first()
-  if rate is not None:
+  existing_rate = Rates.query.filter_by(from_currency=from_currency,to_currency=to_currency).first()
+  if existing_rate is not None:
    return jsonify({'error':'Conversion rate already exists'}), 400
   
-  new_rate=Rates(from_currency=from_currency,to_currency=to_currency,rate=rate)
+  new_rate=Rates(from_currency=from_currency,to_currency=to_currency)
+  new_rate.rate=rate_value
   db.session.add(new_rate)
   db.session.commit()
  
   response = {
-    'rate': rate ,
+    'rate': new_rate.rate ,
     'from_currency': from_currency,
     'to_currency': to_currency,
   }
